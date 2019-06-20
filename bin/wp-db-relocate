@@ -1,0 +1,12 @@
+#!/usr/bin/env php
+<?php
+error_reporting(E_ALL);
+
+require __DIR__.'/../vendor/autoload.php';
+
+if (!defined('PDO::ATTR_DRIVER_NAME')) {
+    die("PDO Not available");
+}
+
+(new WpDbRelocate())->run($argv);
+

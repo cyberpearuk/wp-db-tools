@@ -1,0 +1,23 @@
+{
+    "name": "cyberpearuk/wp-db-tools",
+    "description": "Basic CLI Tools for administering WordPress",
+    "type": "project",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "James Buncle",
+            "email": "jbuncle@hotmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "CyberPear\\WpDbTools\\": "src/"
+        }
+    },
+    "bin": ["bin/wp-db-relocate"],
+    "require": {
+        "php": "^7.1",
+        "ext-pdo": "*",
+        "ext-pdo_mysql": "*"
+    }
+}
