@@ -2,7 +2,20 @@
 <?php
 error_reporting(E_ALL);
 
-require __DIR__.'/../vendor/autoload.php';
+// Lookup autoload dir
+(function() {
+    $autoload = [
+        __DIR__ . '/../../autoload.php',
+        __DIR__ . '/../vendor/autoload.php',
+        __DIR__ . '/vendor/autoload.php'
+    ];
+    foreach ($autoload as $file) {
+        if (file_exists($file)) {
+            require $file;
+            break;
+        }
+    }
+})();
 
 if (!defined('PDO::ATTR_DRIVER_NAME')) {
     die("PDO Not available");
