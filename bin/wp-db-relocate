@@ -5,16 +5,17 @@ error_reporting(E_ALL);
 // Lookup autoload dir
 (function() {
     $autoload = [
-        __DIR__ . '/../../autoload.php',
-        __DIR__ . '/../vendor/autoload.php',
-        __DIR__ . '/vendor/autoload.php'
+        __DIR__ . '/../../../autoload.php',
+        __DIR__ . '/../../vendor/autoload.php',
+        __DIR__ . '/../vendor/autoload.php'
     ];
     foreach ($autoload as $file) {
         if (file_exists($file)) {
             require $file;
-            break;
+            return;
         }
     }
+    die("autoload.php not found in any of: " . implode(', ', $autoload));
 })();
 
 if (!defined('PDO::ATTR_DRIVER_NAME')) {
