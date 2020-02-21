@@ -19,7 +19,9 @@
 
 namespace CyberPear\WpDbTools\Pdo;
 
+use Exception;
 use PDO;
+use PDOStatement;
 
 /**
  * PdoUtility
@@ -27,30 +29,45 @@ use PDO;
  * @author James Buncle <jbuncle@hotmail.com>
  */
 class PdoUtility {
-    
+
     /**
      *
      * @var PDO
      */
     private $pdo;
-    
+
     public function __construct(PDO $pdo) {
         $this->pdo = $pdo;
     }
 
-    public function doQuery(string $query, array $params, callable $callback): void {
-        $stmt = $this->pdo->prepare($query);
-
+    public function doQuery(string $query, array $params, ?callable $callback = null): bool {
+        $stmt = $this->prepare($query);
         $stmt->execute($params);
-        if ($stmt->execute()) {
+        if (!$stmt->execute()) {
+            return false;
+        }
+        if ($callback !== null) {
+            /** @var array $row */
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $callback($row);
             }
         }
+
+        return true;
     }
 
     public function doUpdate(string $query, array $params): bool {
-        return $this->pdo->prepare($query)->execute($params);
+        $stmt = $this->prepare($query);
+
+        return $stmt->execute($params);
+    }
+
+    private function prepare(string $query): PDOStatement {
+        $stmt = $this->pdo->prepare($query);
+        if ($stmt === false) {
+            throw new Exception("Failed to prepare statement.");
+        }
+        return $stmt;
     }
 
 }

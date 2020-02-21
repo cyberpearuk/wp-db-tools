@@ -19,13 +19,14 @@
 
 namespace CyberPear\WpDbTools;
 
+use CyberPear\WpDbTools\Pdo\PdoConnectionInfo;
 use CyberPear\WpDbTools\Pdo\PdoDbTransaction;
 use CyberPear\WpDbTools\Pdo\PdoUtility;
 use CyberPear\WpDbTools\Pdo\PdoUtilityConnection;
 use PDO;
 
 /**
- * Description of WpDbRelocate
+ * WpDbRelocate
  *
  * @author James Buncle <jbuncle@hotmail.com>
  */
@@ -42,17 +43,18 @@ class WpDbRelocate {
 
         echo "Replacing '$needle' with '$replacement'\n";
 
-        $pdoDbConnect = new PdoDbTransaction($servername, $username, $password, $dbname);
+        $pdoConnectionInfo = new PdoConnectionInfo($servername, $username, $password, $dbname);
+        $pdoDbConnect = new PdoDbTransaction($pdoConnectionInfo);
         $pdoUtilityConnection = new PdoUtilityConnection($pdoDbConnect);
 
-        $this->updateDatabase($pdoUtilityConnection, $needle, $replacement);
+        $this->updateWpDatabase($pdoUtilityConnection, $needle, $replacement);
 
         echo "Update complete\n";
     }
 
     /**
      * 
-     * @param PDO $pdoUtility
+     * @param PdoUtility $pdoUtility
      * @param string $needle      The value to search for.
      * @param string $replacement The value to replace with.
      * @param string $idField     The field (db column name) to use for entry ID.
@@ -73,7 +75,7 @@ class WpDbRelocate {
         $params = [
             ':needle' => $needle,
         ];
-        
+
         $pdoUtility->doQuery($query, $params, function(array $row) use ($pdoUtility, $needle, $replacement, &$updateCount, $idField, $valueField, $table) {
             $value = $row["$valueField"];
 
@@ -85,7 +87,7 @@ class WpDbRelocate {
                     ':id' => $row["$idField"],
                     ':value' => $newValue,
                 ];
-
+                // Update to the field
                 $pdoUtility->doQuery($query, $params);
                 $updateCount++;
             }
@@ -93,7 +95,7 @@ class WpDbRelocate {
         echo "Updated '$updateCount' rows in '$table' for value '$valueField'\n";
     }
 
-    private function updateDatabase(\PdoUtilityConnection $pdoUtilityConnection, string $needle, string $replacement) {
+    private function updateWpDatabase(PdoUtilityConnection $pdoUtilityConnection, string $needle, string $replacement) {
         $pdoUtilityConnection->connect(function(PdoUtility $pdoUtility) use ($needle, $replacement) {
             $this->updateTable($pdoUtility, $needle, $replacement, 'option_id', 'option_value', 'wp_options');
             $this->updateTable($pdoUtility, $needle, $replacement, 'ID', 'post_content', 'wp_posts');

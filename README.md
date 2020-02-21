@@ -1,5 +1,7 @@
 # WordPress DB Tools
 
+[![Packagist](https://img.shields.io/packagist/v/cyberpearuk/wp-db-tools.svg)](https://packagist.org/packages/cyberpearuk/wp-db-tools)
+
 Basic CLI Tools for administering WordPress.
 
 Currently only consisting of a WordPress relocate script.
@@ -20,4 +22,4 @@ Or you can run directly with:
 
 ## Maintainer
 
-This repository is maintained by CyberPear (https://www.cyberpear.co.uk)
+This repository is maintained by [www.cyberpear.co.uk](https://www.cyberpear.co.uk).
