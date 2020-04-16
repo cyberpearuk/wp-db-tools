@@ -42,8 +42,8 @@ class PdoUtility {
 
     public function doQuery(string $query, array $params, ?callable $callback = null): bool {
         $stmt = $this->prepare($query);
-        $stmt->execute($params);
-        if (!$stmt->execute()) {
+        
+        if (!$stmt->execute($params)) {
             return false;
         }
         if ($callback !== null) {

@@ -41,7 +41,7 @@ class WpDbRelocate {
         $replacement = $argv[5];
         $dbname = "wordpress";
 
-        echo "Replacing '$needle' with '$replacement'\n";
+        echo "Replacing '{$needle}' with '{$replacement}' in '{$username}@{$servername}' db '{$dbname}'\n";
 
         $pdoConnectionInfo = new PdoConnectionInfo($servername, $username, $password, $dbname);
         $pdoDbConnect = new PdoDbTransaction($pdoConnectionInfo);
@@ -70,29 +70,39 @@ class WpDbRelocate {
             string $valueField,
             string $table
     ): void {
-        $query = "SELECT `$idField`, `$valueField` FROM `$table` WHERE `$valueField` LIKE '%:needle%'";
+        $query = "SELECT `$idField`, `$valueField`"
+                . " FROM `$table`"
+                . " WHERE `$valueField` LIKE :needle";
+
         $updateCount = 0;
         $params = [
-            ':needle' => $needle,
+            ':needle' => '%' . $needle . '%',
         ];
 
-        $pdoUtility->doQuery($query, $params, function(array $row) use ($pdoUtility, $needle, $replacement, &$updateCount, $idField, $valueField, $table) {
+        $success = $pdoUtility->doQuery($query, $params, function(array $row) use ($pdoUtility, $needle, $replacement, &$updateCount, $idField, $valueField, $table) {
             $value = $row["$valueField"];
 
-            if (StringUtils::contains($value, $needle)) {
-                $query = "UPDATE `$table` SET `$valueField`=:value WHERE `$idField`=:id";
+            $query = "UPDATE `$table` SET `$valueField`=:value WHERE `$idField`=:id";
 
-                $newValue = FindReplaceUtility::findReplaceSerialised($needle, $replacement, $value);
-                $params = [
-                    ':id' => $row["$idField"],
-                    ':value' => $newValue,
-                ];
-                // Update to the field
-                $pdoUtility->doQuery($query, $params);
-                $updateCount++;
+            $newValue = FindReplaceUtility::findReplaceSerialised($needle, $replacement, $value);
+            
+            if (strcmp($value, $newValue) === 0) {
+                // Don't bother updating
+                return;
             }
+            $params = [
+                ':id' => $row["$idField"],
+                ':value' => $newValue,
+            ];
+            // Update to the field
+            $pdoUtility->doQuery($query, $params);
+            $updateCount++;
         });
-        echo "Updated '$updateCount' rows in '$table' for value '$valueField'\n";
+        if ($success) {
+            echo "Updated '$updateCount' rows in '$table' for value '$valueField'\n";
+        } else {
+            echo "Query failed\n";
+        }
     }
 
     private function updateWpDatabase(PdoUtilityConnection $pdoUtilityConnection, string $needle, string $replacement) {
