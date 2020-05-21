@@ -22,4 +22,4 @@ Or you can run directly with:
 
 ## Maintainer
 
-This repository is maintained by [www.cyberpear.co.uk](https://www.cyberpear.co.uk).
+This repository is maintained by [Black Pear Digital](https://www.blackpeardigital.co.uk).
