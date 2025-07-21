@@ -1,5 +1,21 @@
 #!/usr/bin/env php
 <?php
+
+/**
+ * wp-db-relocate
+ *
+ * CLI wrapper script for WpDbRelocate.
+ *
+ * Bootstraps Composer autoload, ensures PDO is available,
+ * and delegates to the WpDbRelocate class to perform a search-and-replace
+ * across a WordPress database (handling serialized data safely).
+ *
+ * Usage:
+ *   chmod +x bin/wp-db-relocate
+ *   ./bin/wp-db-relocate <servername> <username> <password> <search> <replace>
+ *
+ * @see CyberPear\WpDbTools\WpDbRelocate
+ */
 error_reporting(E_ALL);
 
 // Lookup autoload dir

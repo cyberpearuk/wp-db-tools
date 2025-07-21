@@ -28,10 +28,21 @@ use PDO;
 /**
  * WpDbRelocate
  *
- * @author James Buncle <jbuncle@hotmail.com>
+ * Provides functionality to search and replace serialized or plain values
+ * across WordPress database tables (options, posts, postmeta).
+ *
+ * Usage:
+ *   php wp-db-relocate <servername> <username> <password> <search> <replace>
+ *
+ * @package CyberPear\WpDbTools
  */
 class WpDbRelocate {
-
+    /**
+     * Entry point for CLI usage.
+     *
+     * @param string[] $argv Command-line arguments (script, server, user, pass, needle, replacement).
+     * @return void
+     */
     public function run($argv): void {
         $servername = $argv[1];
         $username = $argv[2];
@@ -53,13 +64,14 @@ class WpDbRelocate {
     }
 
     /**
-     * 
-     * @param PdoUtility $pdoUtility
-     * @param string $needle      The value to search for.
-     * @param string $replacement The value to replace with.
-     * @param string $idField     The field (db column name) to use for entry ID.
-     * @param string $valueField  The field (db column name) to search and replace in.
-     * @param string $table       The database table name
+     * Search and replace in a specific table column.
+     *
+     * @param PdoUtility $pdoUtility The PDO utility instance.
+     * @param string     $needle     The value to search for.
+     * @param string     $replacement The value to replace with.
+     * @param string     $idField    The field (db column name) to use for entry ID.
+     * @param string     $valueField The field (db column name) to search and replace in.
+     * @param string     $table      The database table name.
      * @return void
      */
     private function updateTable(
@@ -105,6 +117,14 @@ class WpDbRelocate {
         }
     }
 
+    /**
+     * Connects to the database and executes find/replace on core WP tables.
+     *
+     * @param PdoUtilityConnection $pdoUtilityConnection Wrapper for connection handling.
+     * @param string               $needle              The search string or serialized fragment.
+     * @param string               $replacement         Replacement string.
+     * @return void
+     */
     private function updateWpDatabase(PdoUtilityConnection $pdoUtilityConnection, string $needle, string $replacement) {
         $pdoUtilityConnection->connect(function(PdoUtility $pdoUtility) use ($needle, $replacement) {
             $this->updateTable($pdoUtility, $needle, $replacement, 'option_id', 'option_value', 'wp_options');
